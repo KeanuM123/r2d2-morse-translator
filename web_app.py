@@ -1,10 +1,11 @@
 # web_app.py
-
+# Web interface using Flask.
+# Perfect for interplanetary browser-based translations.
 from flask import Flask, request, render_template_string
 from translator import lettersToMorseCode, morseCodeToLetters
 
 app = Flask(__name__)
-
+#  Simple HTML for encode/decode interface
 HTML = """
 <!DOCTYPE html>
 <html>

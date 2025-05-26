@@ -1,5 +1,6 @@
 # gui.py
-
+#  Desktop GUI app using Tkinter.
+# Even a protocol droid could use this interface.
 import tkinter as tk
 from translator import lettersToMorseCode, morseCodeToLetters
 from sound import play_morse_code
@@ -15,6 +16,7 @@ def decode():
     result = morseCodeToLetters(msg)
     output_text.set(result)
 
+#  GUI Layout
 root = tk.Tk()
 root.title("R2-D2 Morse Code Translator")
 
