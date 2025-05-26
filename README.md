@@ -44,3 +44,25 @@ py gui.py
 
 py web_app.py
 # Then go to http://localhost:5000
+
+📖 About
+
+R2-D2 Morse Code Translator is a fun, multi-interface Python project inspired by the Star Wars universe. It converts plain text to Morse code and vice versa, helping R2-D2 decode secret rebel transmissions—or send encrypted jokes to C-3PO!
+
+This project includes:
+
+✅ A clean Python backend for encoding and decoding
+
+🖥️ A command-line interface (CLI)
+
+🔊 Sound effects that beep like a droid
+
+🪟 A graphical desktop app (GUI) using Tkinter
+
+🌐 A simple web interface built with Flask
+
+🧪 Unit tests and full GitHub workflow
+
+Built with readability, functionality, and fun in mind — perfect for learning about text encoding, GUIs, and Python web apps!
+
+“Beep beep bwoop!” — R2-D2
