@@ -1,11 +1,13 @@
 # web_app.py
-# Web interface using Flask.
-# Perfect for interplanetary browser-based translations.
+# 🛰️ Web interface using Flask to translate to/from Morse code.
+# 🕵️‍♂️ Includes theme switcher and audio playback for encoding messages.
+
 from flask import Flask, request, render_template_string
 from translator import lettersToMorseCode, morseCodeToLetters
 
 app = Flask(__name__)
-# HTML for encode/decode interface
+
+# ⚠️ HTML template with theme switcher, star background, and sound player
 HTML = """
 <!DOCTYPE html>
 <html>
@@ -115,7 +117,7 @@ HTML = """
   <canvas id="stars"></canvas>
 
   <div class="theme-switcher">
-    <button id="theme-toggle">🌓 Switch Theme</button>
+    <button id="theme-toggle" type="button">🌓 Switch Theme</button>
   </div>
 
   <div class="container">
@@ -123,14 +125,14 @@ HTML = """
     <form method="post">
       <input type="text" name="text" placeholder="Enter your secret message here..." required>
       <br>
-      <button name="action" value="encode">Encode</button>
-      <button name="action" value="decode">Decode</button>
+      <button type="submit" name="action" value="encode">Encode</button>
+      <button type="submit" name="action" value="decode">Decode</button>
     </form>
 
     {% if result %}
     <div class="result">
       <h3>🔎 Translation:</h3>
-      <p>{{ result }}</p>
+      <p id="morse">{{ result }}</p>
     </div>
     {% endif %}
 
@@ -141,7 +143,7 @@ HTML = """
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // 🌌 Animated Stars
+      // ⭐ Animated stars
       const canvas = document.getElementById('stars');
       const ctx = canvas.getContext('2d');
       let stars = [], numStars = 100;
@@ -183,27 +185,61 @@ HTML = """
         requestAnimationFrame(animate);
       }
 
+      resize();
+      createStars();
+      animate();
       window.addEventListener('resize', () => {
         resize();
         createStars();
       });
 
-      resize();
-      createStars();
-      animate();
-
-      // 🌓 Theme Toggle
+      // 🌓 Theme toggle
       const themeButton = document.querySelector('#theme-toggle');
       const body = document.body;
-
-      themeButton.addEventListener('click', () => {
-        const isLight = body.classList.toggle('light');
-        localStorage.setItem('theme', isLight ? 'light' : 'dark');
-      });
-
       const savedTheme = localStorage.getItem('theme');
       if (savedTheme === 'light') {
         body.classList.add('light');
+      }
+
+      themeButton.addEventListener('click', () => {
+        body.classList.toggle('light');
+        const isLight = body.classList.contains('light');
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      });
+
+      // 🔊 Sound player for Morse code
+      const encodeBtn = document.querySelector('button[name="action"][value="encode"]');
+      encodeBtn.addEventListener('click', () => {
+        setTimeout(() => {
+          const text = document.querySelector('#morse')?.innerText;
+          if (!text) return;
+          const context = new (window.AudioContext || window.webkitAudioContext)();
+          let t = context.currentTime;
+
+          for (const c of text) {
+            if (c === '.') {
+              beep(context, t, 0.1);
+              t += 0.2;
+            } else if (c === '-') {
+              beep(context, t, 0.3);
+              t += 0.4;
+            } else {
+              t += 0.2;
+            }
+          }
+        }, 200);
+      });
+
+      function beep(context, time, duration) {
+        const oscillator = context.createOscillator();
+        const gainNode = context.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(700, time);
+        gainNode.gain.setValueAtTime(0.5, time);
+        oscillator.connect(gainNode);
+        gainNode.connect(context.destination);
+        oscillator.start(time);
+        oscillator.stop(time + duration);
       }
     });
   </script>
@@ -213,10 +249,12 @@ HTML = """
 
 @app.route("/", methods=["GET", "POST"])
 def index():
+    # 🧠 Decode incoming request
     result = ""
     if request.method == "POST":
         text = request.form["text"]
         action = request.form["action"]
+        # 📨 Handle encode or decode
         if action == "encode":
             result = lettersToMorseCode(text)
         elif action == "decode":
@@ -224,4 +262,5 @@ def index():
     return render_template_string(HTML, result=result)
 
 if __name__ == "__main__":
+    # 🧪 Fire up Flask locally
     app.run(debug=True)
