@@ -10,12 +10,13 @@ app = Flask(__name__)
 # ⚠️ HTML template with theme switcher, star background, and sound player
 HTML = """
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>R2-D2 Morse Code Translator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
-
     :root {
       --bg-color: #000;
       --text-color: #FFE81F;
@@ -117,7 +118,7 @@ HTML = """
   <canvas id="stars"></canvas>
 
   <div class="theme-switcher">
-    <button id="theme-toggle" type="button">🌓 Switch Theme</button>
+    <button id="theme-toggle">🌓 Switch Theme</button>
   </div>
 
   <div class="container">
@@ -125,14 +126,15 @@ HTML = """
     <form method="post">
       <input type="text" name="text" placeholder="Enter your secret message here..." required>
       <br>
-      <button type="submit" name="action" value="encode">Encode</button>
-      <button type="submit" name="action" value="decode">Decode</button>
+      <button name="action" value="encode">Encode</button>
+      <button name="action" value="decode">Decode</button>
+      <button type="button" id="play-sound">🔊 Play Sound</button>
     </form>
 
     {% if result %}
     <div class="result">
       <h3>🔎 Translation:</h3>
-      <p id="morse">{{ result }}</p>
+      <p>{{ result }}</p>
     </div>
     {% endif %}
 
@@ -143,7 +145,6 @@ HTML = """
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // ⭐ Animated stars
       const canvas = document.getElementById('stars');
       const ctx = canvas.getContext('2d');
       let stars = [], numStars = 100;
@@ -185,61 +186,72 @@ HTML = """
         requestAnimationFrame(animate);
       }
 
-      resize();
-      createStars();
-      animate();
       window.addEventListener('resize', () => {
         resize();
         createStars();
       });
 
-      // 🌓 Theme toggle
-      const themeButton = document.querySelector('#theme-toggle');
+      resize();
+      createStars();
+      animate();
+
+      // Theme Toggle
+      const themeButton = document.getElementById('theme-toggle');
       const body = document.body;
       const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'light') {
-        body.classList.add('light');
-      }
+      if (savedTheme === 'light') body.classList.add('light');
 
       themeButton.addEventListener('click', () => {
         body.classList.toggle('light');
-        const isLight = body.classList.contains('light');
-        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        localStorage.setItem('theme', body.classList.contains('light') ? 'light' : 'dark');
       });
 
-      // 🔊 Sound player for Morse code
-      const encodeBtn = document.querySelector('button[name="action"][value="encode"]');
-      encodeBtn.addEventListener('click', () => {
-        setTimeout(() => {
-          const text = document.querySelector('#morse')?.innerText;
-          if (!text) return;
-          const context = new (window.AudioContext || window.webkitAudioContext)();
-          let t = context.currentTime;
+      // Play Sound
+      const playButton = document.getElementById('play-sound');
+      const resultElement = document.querySelector('.result p');
 
-          for (const c of text) {
-            if (c === '.') {
-              beep(context, t, 0.1);
-              t += 0.2;
-            } else if (c === '-') {
-              beep(context, t, 0.3);
-              t += 0.4;
-            } else {
-              t += 0.2;
-            }
+      playButton.addEventListener('click', () => {
+        if (!resultElement) return;
+        const morseCode = resultElement.textContent.trim();
+        playMorseCode(morseCode);
+      });
+
+      function playMorseCode(morse) {
+        const unit = 100;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let time = audioCtx.currentTime;
+
+        for (let char of morse) {
+          switch (char) {
+            case '.':
+              beep(audioCtx, time, unit);
+              time += unit / 1000 + 0.1;
+              break;
+            case '-':
+              beep(audioCtx, time, unit * 3);
+              time += (unit * 3) / 1000 + 0.1;
+              break;
+            case ' ':
+              time += (unit * 3) / 1000;
+              break;
+            case '/':
+              time += (unit * 7) / 1000;
+              break;
           }
-        }, 200);
-      });
+        }
+      }
 
-      function beep(context, time, duration) {
-        const oscillator = context.createOscillator();
-        const gainNode = context.createGain();
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(700, time);
-        gainNode.gain.setValueAtTime(0.5, time);
+      function beep(audioCtx, time, duration) {
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
         oscillator.connect(gainNode);
-        gainNode.connect(context.destination);
+        gainNode.connect(audioCtx.destination);
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(600, time);
+        gainNode.gain.setValueAtTime(1, time);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, time + duration / 1000);
         oscillator.start(time);
-        oscillator.stop(time + duration);
+        oscillator.stop(time + duration / 1000);
       }
     });
   </script>
