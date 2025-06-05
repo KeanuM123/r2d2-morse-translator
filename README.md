@@ -2,6 +2,11 @@
 
 💡 A fun Python project to encode and decode Morse code messages — because even droids need to talk in secret!
 
+## 💻 Preview
+![Screenshot (62)](https://github.com/user-attachments/assets/28613f5b-91b4-40fa-84d5-478b35b14997)
+
+This is R2-D2's Morse Code Translator running locally with sound and theme switching.
+
 ## 🔧 Features
 - Convert English text to Morse code
 - Convert Morse code to English
