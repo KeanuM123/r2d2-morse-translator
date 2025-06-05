@@ -16,12 +16,12 @@ This is R2-D2's Morse Code Translator running locally with sound and theme switc
 ## 🚀 How to Run
 
 ### 1. Run the CLI
-python cli.py
+py cli.py
 
-2. Run the Tests
-python test_translator.py
+## 2. Run the Tests
+py test_translator.py
 
-🧪 Examples
+## 🧪 Examples
 
 lettersToMorseCode("I like you")
 # => ".. / .-.. .. -.- . / -.-- --- ..-"
@@ -29,7 +29,7 @@ lettersToMorseCode("I like you")
 morseCodeToLetters(".. / .-.. .. -.- . / -.-- --- ..-")
 # => "I LIKE YOU"
 
-📦 File Structure
+## 📦 File Structure
 
 translator.py        # Main logic
 cli.py               # Command-line interface
@@ -45,12 +45,12 @@ README.md            # This file
 ## 🛠️ Run GUI
 py gui.py
 
-🌐 Run Web Version
+## 🌐 Run Web Version
 
 py web_app.py
 # Then go to http://localhost:5000
 
-📖 About
+## 📖 About
 
 R2-D2 Morse Code Translator is a fun, multi-interface Python project inspired by the Star Wars universe. It converts plain text to Morse code and vice versa, helping R2-D2 decode secret rebel transmissions—or send encrypted jokes to C-3PO!
 
